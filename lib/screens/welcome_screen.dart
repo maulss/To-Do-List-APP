@@ -42,38 +42,49 @@ class WelcomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  Container(
-                    alignment: Alignment.center,
-                    height: 48,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: ColorConstant.buttonColor,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      "LOGIN",
-                      style: TextStyleConstant.lato.copyWith(
-                        fontSize: 16,
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/login_screen');
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 48,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: ColorConstant.buttonColor,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        "LOGIN",
+                        style: TextStyleConstant.lato.copyWith(
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(
                     height: 28,
                   ),
-                  Container(
-                    alignment: Alignment.center,
-                    height: 48,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: ColorConstant.buttonColor,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacementNamed(
+                          context, '/register_screen');
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 48,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: ColorConstant.buttonColor,
+                        ),
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      "CREATE ACCOUNT",
-                      style: TextStyleConstant.lato.copyWith(
-                        fontSize: 16,
+                      child: Text(
+                        "CREATE ACCOUNT",
+                        style: TextStyleConstant.lato.copyWith(
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   )

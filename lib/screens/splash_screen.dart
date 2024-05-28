@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/constants/text_style_constant.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,9 +13,18 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   void checkUser() async {
-    Future.delayed(const Duration(seconds: 3), () {
+    await Future.delayed(const Duration(seconds: 3));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? seeOnBoarding = prefs.getBool('seenOrboarding');
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (seeOnBoarding == null) {
       Navigator.pushReplacementNamed(context, '/on_boarding');
-    });
+    } else if (user != null) {
+      Navigator.pushReplacementNamed(context, '/home_screen');
+    } else {
+      Navigator.pushReplacementNamed(context, '/login_screen');
+    }
   }
 
   @override
