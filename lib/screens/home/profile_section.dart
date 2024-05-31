@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:todo_app/constants/color_constant.dart';
 import 'package:todo_app/constants/text_style_constant.dart';
 import 'package:todo_app/controller/profile_controller.dart';
@@ -19,6 +23,7 @@ class _ProfileSectionState extends State<ProfileSection> {
   }
 
   User? currentuser = FirebaseAuth.instance.currentUser;
+  final userCollection = FirebaseFirestore.instance.collection("Users");
   final ProfileController profileController = Get.put(ProfileController());
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetail() async {
@@ -29,6 +34,36 @@ class _ProfileSectionState extends State<ProfileSection> {
   }
 
   String newName = "";
+
+  final ImagePicker _imagePicker = ImagePicker();
+  String? imageUrl;
+  Future<void> pickImage() async {
+    try {
+      XFile? res = await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (res != null) {
+        uploadImageToFireBase(File(res.path));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> uploadImageToFireBase(File image) async {
+    try {
+      Reference reference = FirebaseStorage.instance
+          .ref()
+          .child("images/${DateTime.now().microsecond}.png");
+      await reference.putFile(image).whenComplete(printInfo);
+      await userCollection.doc(currentuser?.email).update({
+        "image": await reference.getDownloadURL(),
+      });
+      setState(() async {
+        imageUrl = await reference.getDownloadURL();
+      });
+    } catch (e) {
+      print("gagal memasukkan data");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +88,43 @@ class _ProfileSectionState extends State<ProfileSection> {
                 const SizedBox(
                   height: 24,
                 ),
-                Container(
-                  height: 85,
-                  width: 85,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                ),
+                FutureBuilder(
+                    future: getUserDetail(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text("Error : ${snapshot.hasError}");
+                      } else if (snapshot.hasData) {
+                        var userData = snapshot.data?.data();
+                        if (userData?["image"] != null) {
+                          return Container(
+                            height: 85,
+                            width: 85,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  userData?["image"],
+                                ),
+                              ),
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                          );
+                        } else {
+                          return Container(
+                            height: 85,
+                            width: 85,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                          );
+                        }
+                      } else {
+                        return const Text("eror");
+                      }
+                    }),
                 const SizedBox(
                   height: 10,
                 ),
@@ -187,9 +251,14 @@ class _ProfileSectionState extends State<ProfileSection> {
                 const SizedBox(
                   height: 8,
                 ),
-                ContainerItem(
-                  name: "Change account Image",
-                  nameAsset: "assets/images/camera.png",
+                GestureDetector(
+                  onTap: () {
+                    pickImage();
+                  },
+                  child: ContainerItem(
+                    name: "Change account Image",
+                    nameAsset: "assets/images/camera.png",
+                  ),
                 ),
                 const SizedBox(
                   height: 16,

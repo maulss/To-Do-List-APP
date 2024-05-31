@@ -303,8 +303,10 @@ class _HomeScreensState extends State<HomeScreens> {
             CalendarSection(),
             Center(
               child: Text(
-                'Focus',
-                style: TextStyleConstant.lato,
+                'C O M I N G \n S O O N ! ! !',
+                style: TextStyleConstant.lato.copyWith(
+                  fontSize: 30,
+                ),
               ),
             ),
             ProfileSection(),

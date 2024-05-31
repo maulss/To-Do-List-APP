@@ -11,6 +11,12 @@ class HomeController extends GetxController {
 
   Rx<DateTime> currentDate = DateTime.now().obs;
 
+  @override
+  void onInit() {
+    getUserDetail();
+    super.onInit();
+  }
+
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetail() async {
     return await FirebaseFirestore.instance
         .collection("Users")

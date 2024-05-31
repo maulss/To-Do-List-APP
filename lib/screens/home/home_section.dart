@@ -13,6 +13,7 @@ class HomeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    homeController.onInit;
     return Scaffold(
       backgroundColor: ColorConstant.backgroundColor,
       body: Padding(
@@ -36,16 +37,47 @@ class HomeSection extends StatelessWidget {
                     fontSize: 20,
                   ),
                 ),
-                Container(
-                  height: 42,
-                  width: 42,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/image_kosoong.png"),
-                    ),
-                  ),
+                FutureBuilder(
+                  future: homeController.getUserDetail(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text("Error : ${snapshot.hasError}"),
+                      );
+                    } else if (snapshot.hasData) {
+                      var userData = snapshot.data?.data();
+                      if (userData?["image"] != null) {
+                        return Container(
+                          height: 42,
+                          width: 42,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                userData?["image"],
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          height: 42,
+                          width: 42,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                        );
+                      }
+                    } else {
+                      return Text("eror");
+                    }
+                  },
                 ),
               ],
             ),
