@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/constants/color_constant.dart';
@@ -32,6 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       UserCredential? userCredential =
           await fireAuth.createUserWithEmailAndPassword(
               email: emailController.text, password: passwordController.text);
+      createUserDocument(userCredential);
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
       const snackBar = SnackBar(
@@ -50,6 +52,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         displaMessageUser("Email already in use", context);
       }
     }
+  }
+
+  Future<void> createUserDocument(UserCredential? userCredential) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userCredential?.user!.email)
+        .set({
+      "email": userCredential!.user?.email,
+      "name": userNameController.text,
+      "task": [],
+      "image": '',
+    });
   }
 
   @override

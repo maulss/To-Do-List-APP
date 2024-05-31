@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/screens/login_screen.dart';
 import 'package:todo_app/screens/register_screen.dart';
 import 'package:todo_app/screens/splash_screen.dart';
-import 'package:todo_app/screens/home_screens.dart';
+import 'package:todo_app/screens/home/home_screens.dart';
 import 'package:todo_app/screens/on_boarding_screen.dart';
 import 'package:todo_app/screens/welcome_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       initialRoute: '/flash_screen',

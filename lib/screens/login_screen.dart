@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:todo_app/constants/color_constant.dart';
 import 'package:todo_app/constants/text_style_constant.dart';
+import 'package:todo_app/controller/login_controller.dart';
 import 'package:todo_app/screens/widgets/form_widget.dart';
 import 'package:todo_app/helper.dart/message_helper.dart';
 
@@ -28,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
       await fireAuth.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
       if (context.mounted) Navigator.pop(context);
-      Navigator.pushReplacementNamed(context, '/home_screen');
+      Get.offNamed("/home_screen");
+      // Navigator.pushReplacementNamed(context, '/home_screen');
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       displaMessageUser(e.code, context);
@@ -36,8 +39,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   bool isObsecure = true;
+
+  final LoginController loginController = Get.put(LoginController());
   @override
   Widget build(BuildContext context) {
+    print("page ini di rebuild");
     return Scaffold(
       backgroundColor: ColorConstant.backgroundColor,
       body: SafeArea(
@@ -69,29 +75,39 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Column(
                 children: [
-                  FormWidget(
-                    obscureText: false,
-                    controller: emailController,
-                    labelText: "Email",
-                  ),
+                  Obx(() {
+                    return FormWidget(
+                      onChanged: loginController.checkName,
+                      errorText: loginController.erorMessageEmail.value,
+                      obscureText: false,
+                      controller: emailController,
+                      labelText: "Email",
+                    );
+                  }),
                   const SizedBox(
                     height: 20,
                   ),
-                  FormWidget(
-                    obscureText: isObsecure,
-                    controller: passwordController,
-                    labelText: "Password",
-                    suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(
-                            () {
-                              isObsecure = !isObsecure;
-                            },
-                          );
-                        },
-                        icon: Icon(
-                          isObsecure ? Icons.visibility : Icons.visibility_off,
-                        )),
+                  Obx(
+                    () => FormWidget(
+                      onChanged: loginController.checkPassword,
+                      errorText: loginController.erorMessagePassword.value,
+                      obscureText: isObsecure,
+                      controller: passwordController,
+                      labelText: "Password",
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(
+                              () {
+                                isObsecure = !isObsecure;
+                              },
+                            );
+                          },
+                          icon: Icon(
+                            isObsecure
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          )),
+                    ),
                   ),
                   const SizedBox(
                     height: 5,
@@ -131,7 +147,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      login();
+                      if (loginController.erorMessageEmail.value != null ||
+                          loginController.erorMessagePassword.value != null) {
+                        const snackBar = SnackBar(
+                          duration: Duration(seconds: 1),
+                          content: Text(
+                            'Fix the form',
+                          ),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      } else {
+                        login();
+                      }
                     },
                     child: Container(
                       alignment: Alignment.center,

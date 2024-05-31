@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_app/constants/text_style_constant.dart';
 
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -17,6 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? seeOnBoarding = prefs.getBool('seenOrboarding');
     User? user = FirebaseAuth.instance.currentUser;
+    print(user?.email);
 
     if (seeOnBoarding == null) {
       Navigator.pushReplacementNamed(context, '/on_boarding');
